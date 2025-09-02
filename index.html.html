@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Interactive Birthday Card</title>
+<style>
+  body {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    background: #fff0f6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;
+    user-select: none;
+  }
+  .cake-container {
+    position: relative;
+    width: 200px;
+    height: 300px;
+    margin-bottom: 20px;
+  }
+  .cake {
+    width: 200px;
+    height: 250px;
+    background: linear-gradient(180deg, #fae1ed 0%, #f9a5c3 100%);
+    border-radius: 20px 20px 10px 10px;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4);
+  }
+  .frosting {
+    height: 40px;
+    background: #ff9ccf;
+    border-radius: 20px 20px 0 0;
+  }
+  .candle {
+    width: 14px;
+    height: 80px;
+    background: linear-gradient(180deg, #ffd7e9, #ff4382);
+    border-radius: 3px;
+    position: absolute;
+    top: -90px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 0 10px 3px #ffaad6;
+  }
+  .flame {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 30px;
+    background: radial-gradient(circle at center, #ffdd55, #ff6b00);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    filter: drop-shadow(0 0 5px #ff9a1b);
+    animation: flicker 1s infinite alternate;
+  }
+  @keyframes flicker {
+    0% { transform: translateX(-50%) scale(1);}
+    100% { transform: translateX(-52%) scale(1.1);}
+  }
+  button.blow-button {
+    padding: 12px 24px;
+    font-size: 18px;
+    background: #ff4382;
+    border: none;
+    border-radius: 30px;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 5px 10px #ff4382aa;
+    transition: transform 0.2s ease;
+  }
+  button.blow-button:active {
+    transform: scale(0.95);
+  }
+  .notes {
+    margin-top: 30px;
+    width: 320px;
+    min-height: 350px;
+    background: #ffe3f0;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 10px 25px #ff438299;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    user-select: text;
+  }
+  .notes.show {
+    display: flex;
+  }
+  .note-content {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  .photo-gallery {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  .photo-gallery img {
+    width: 90px;
+    border-radius: 12px;
+    box-shadow: 0 3px 8px #ff438244;
+  }
+  .nav-buttons {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+  .nav-buttons button {
+    background: #ff69a9;
+    border: none;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 3px 8px #ff438288;
+  }
+</style>
+</head>
+<body>
+
+<div class="cake-container" aria-label="Birthday cake with candle">
+  <div class="cake">
+    <div class="frosting"></div>
+    <div class="candle" id="candle">
+      <div class="flame" id="flame"></div>
+    </div>
+  </div>
+</div>
+
+<button class="blow-button" id="blowBtn" aria-label="Blow candle button">Blow Candle</button>
+
+<div class="notes" id="notesContainer" aria-live="polite" aria-atomic="true">
+  <div class="note-content" id="noteContent"></div>
+  <div class="photo-gallery" id="photoGallery"></div>
+  <div class="nav-buttons">
+    <button id="prevNote" aria-label="Previous note">&lt;</button>
+    <button id="nextNote" aria-label="Next note">&gt;</button>
+  </div>
+</div>
+
+<script>
+  const blowBtn = document.getElementById('blowBtn');
+  const flame = document.getElementById('flame');
+  const candle = document.getElementById('candle');
+  const notesContainer = document.getElementById('notesContainer');
+  const noteContent = document.getElementById('noteContent');
+  const photoGallery = document.getElementById('photoGallery');
+  const prevNoteBtn = document.getElementById('prevNote');
+  const nextNoteBtn = document.getElementById('nextNote');
+
+  let notesIndex = 0;
+
+  // Notes data: 3 notes
+  const notes = [
+    {
+      type: "text",
+      content: "🎂 Sending you the sweetest birthday wishes! Hope your day is as fantastic as you are! 💖
